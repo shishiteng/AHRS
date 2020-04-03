@@ -1,14 +1,14 @@
 #include "MahonyAHRS.h"
 #include <math.h>
-
+#include <stdio.h>
 //-------------------------------------------------------------------------------------------
 // Definitions
 
 //kp:速度系数，越大越快
 //ki:准确系数,越大越准确
 #define DEFAULT_SAMPLE_FREQ 200.0f // sample frequency in Hz
-#define twoKpDef (2.0f * 10.0f)     // 2 * proportional gain
-#define twoKiDef (2.0f * 0.0f)     // 2 * integral gain
+#define twoKpDef (2.0f * 0.5f)     // 2 * proportional gain
+#define twoKiDef (2.0f * 0.000f)   // 2 * integral gain
 
 //============================================================================================
 // Functions
@@ -33,6 +33,8 @@ Mahony::Mahony()
 
 void Mahony::update(float gx, float gy, float gz, float ax, float ay, float az, float mx, float my, float mz)
 {
+  // printf("%lf\n", invSqrt(0.78965413321));
+
   float recipNorm;
   float q0q0, q0q1, q0q2, q0q3, q1q1, q1q2, q1q3, q2q2, q2q3, q3q3;
   float hx, hy, bx, bz;
@@ -49,9 +51,9 @@ void Mahony::update(float gx, float gy, float gz, float ax, float ay, float az, 
   }
 
   // Convert gyroscope degrees/sec to radians/sec
-  gx *= 0.0174533f;
-  gy *= 0.0174533f;
-  gz *= 0.0174533f;
+  // gx *= 0.0174533f;
+  // gy *= 0.0174533f;
+  // gz *= 0.0174533f;
 
   // Compute feedback only if accelerometer measurement valid
   // (avoids NaN in accelerometer normalisation)
@@ -158,9 +160,9 @@ void Mahony::updateIMU(float gx, float gy, float gz, float ax, float ay, float a
   float qa, qb, qc;
 
   // Convert gyroscope degrees/sec to radians/sec
-  gx *= 0.0174533f;
-  gy *= 0.0174533f;
-  gz *= 0.0174533f;
+  // gx *= 0.0174533f;
+  // gy *= 0.0174533f;
+  // gz *= 0.0174533f;
 
   // Compute feedback only if accelerometer measurement valid
   // (avoids NaN in accelerometer normalisation)
@@ -235,6 +237,8 @@ void Mahony::updateIMU(float gx, float gy, float gz, float ax, float ay, float a
 
 float Mahony::invSqrt(float x)
 {
+  // return 1 / sqrt(x);
+
   float halfx = 0.5f * x;
   float y = x;
   long i = *(long *)&y;

@@ -2,6 +2,7 @@
 #include "sensor_msgs/Imu.h"
 #include "geometry_msgs/PoseStamped.h"
 #include "MadgwickAHRS.h"
+#include <eigen3/Eigen/Dense>
 
 Madgwick ahrs_;
 
@@ -31,16 +32,20 @@ void imuCallback(const sensor_msgs::Imu::ConstPtr &msg)
     float q[4] = {0};
     ahrs_.getQuaternion(q);
 
+    Eigen::Quaternionf Q(q[0],q[1],q[2],q[3]);
+    Q = Q.normalized();
+    printf("wxyz: %f %f %f %f\n",Q.w(),Q.x(),Q.y(),Q.z());
+
     geometry_msgs::PoseStamped posestamped;
-    posestamped.header.frame_id = "imu";
+    posestamped.header.frame_id = "world";
     posestamped.header.stamp = msg->header.stamp;
     posestamped.pose.position.x = 0.;
     posestamped.pose.position.y = 0.;
     posestamped.pose.position.z = 0.;
-    posestamped.pose.orientation.w = q[0];
-    posestamped.pose.orientation.x = q[1];
-    posestamped.pose.orientation.y = q[2];
-    posestamped.pose.orientation.z = q[3];
+    posestamped.pose.orientation.w = Q.w();
+    posestamped.pose.orientation.x = Q.x();
+    posestamped.pose.orientation.y = Q.y();
+    posestamped.pose.orientation.z = Q.z();
 
     pub_pose_.publish(posestamped);
 }

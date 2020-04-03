@@ -5,7 +5,7 @@
 
 Mahony ahrs_;
 
-ros::Publisher pub_pose_;
+ros::Publisher pub_pose_, pub_imu_;
 
 void imuCallback(const sensor_msgs::Imu::ConstPtr &msg)
 {
@@ -43,6 +43,11 @@ void imuCallback(const sensor_msgs::Imu::ConstPtr &msg)
     posestamped.pose.orientation.z = q[3];
 
     pub_pose_.publish(posestamped);
+
+    sensor_msgs::Imu imu_with_pose;
+    imu_with_pose = *msg;
+    imu_with_pose.orientation = posestamped.pose.orientation;
+    pub_imu_.publish(imu_with_pose);
 }
 
 int main(int argc, char **argv)
@@ -52,6 +57,7 @@ int main(int argc, char **argv)
 
     ros::Subscriber sub = n.subscribe("imu0", 1, imuCallback);
     pub_pose_ = n.advertise<geometry_msgs::PoseStamped>("ahrs_mahony", 1);
+    pub_imu_ = n.advertise<sensor_msgs::Imu>("imu0_with_pose", 1);
 
     ros::spin();
     return 0;
